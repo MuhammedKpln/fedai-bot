@@ -26,7 +26,7 @@ func SendQuotedMessage(chatJID types.JID, text string, senderJID string, infoID 
 	})
 }
 
-func SendMessage(chatJID types.JID, text string, senderJID string, infoID *string, quotedMessage *waE2E.Message) {
+func SendMessage(chatJID types.JID, text string, senderJID string, infoID *string) {
 	client := C.GetClient()
 
 	go client.SendMessage(context.Background(), chatJID, &waE2E.Message{

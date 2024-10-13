@@ -4,14 +4,12 @@ import (
 	C "muhammedkpln/fedai/core"
 	M "muhammedkpln/fedai/modules"
 	S "muhammedkpln/fedai/shared"
+
 	_ "github.com/mattn/go-sqlite3"
 	"go.mau.fi/whatsmeow/types"
-	waLog "go.mau.fi/whatsmeow/util/log"
 
 	"go.mau.fi/whatsmeow/types/events"
 )
-
-var appLog = waLog.Stdout("APP", "INFO", true)
 
 func CommandCatcher(message string) *S.Plugin {
 	var pl *S.Plugin
@@ -36,11 +34,11 @@ func handleMessageEvent(message *events.Message) {
 	// set as unavailable to not see(?) the message
 	go C.GetClient().SendChatPresence(message.Info.Chat, "unavailable", types.ChatPresenceMediaText)
 	var m = message.Message.ExtendedTextMessage
-	var textMessage = m.GetText()
+	var textMessage = message.Message.GetConversation()
 
 	// Catch only messages
-	if m != nil {
-		var ci = m.ContextInfo
+	if message.Message.Conversation != nil || m != nil {
+		var ci = m.GetContextInfo()
 
 		var context S.PluginRunOptions = S.PluginRunOptions{
 			IsQuoted:  false,
@@ -66,7 +64,9 @@ func handleMessageEvent(message *events.Message) {
 
 		}
 
-		pl := CommandCatcher(textMessage)
+		textMessageWrapper := S.If(m != nil, *m.Text, textMessage)
+
+		pl := CommandCatcher(textMessageWrapper)
 		if pl != nil {
 			go pl.CommandFn(&context)
 		}
@@ -77,17 +77,18 @@ func handleMessageEvent(message *events.Message) {
 func eventHandler(evt interface{}) {
 	switch v := evt.(type) {
 	case *events.Message:
-		handleMessageEvent(v)
+		go handleMessageEvent(v)
 
 	case *events.Connected:
-		appLog.Infof("Connection established")
+		C.AppLog().Infof("Connection established")
 
 	}
 }
 
 func main() {
+	C.LoadDotenv()
 	M.LoadModules()
-	appLog.Infof("Modules loaded")
+	C.AppLog().Infof("Modules loaded")
 	C.EstablishConnection(eventHandler)
 
 }
