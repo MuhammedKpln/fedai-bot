@@ -1,0 +1,13 @@
+services:
+  fedai:
+    build: 
+      dockerfile: Dockerfile
+    command: ./main
+    env_file:
+      - .env
+    volumes:
+      - data:/opt/fedai
+
+volumes:
+  data:
+    driver: local
