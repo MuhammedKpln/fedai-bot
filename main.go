@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	C "muhammedkpln/fedai/core"
 	M "muhammedkpln/fedai/modules"
 	S "muhammedkpln/fedai/shared"
@@ -68,7 +69,19 @@ func handleMessageEvent(message *events.Message) {
 
 		pl := CommandCatcher(textMessageWrapper)
 		if pl != nil {
+			fmt.Println(context.SenderJID, C.GetClient().Store.ID)
+			// fmt.Println(bool(*pl.IsPublic))
+
+			if pl.IsPublic == nil {
+				if message.Info.Sender.ToNonAD() != C.GetClient().Store.ID.ToNonAD() {
+					// Plugin is not allowed to be used of other users, return
+					return
+				}
+
+			}
+			fmt.Println("selam")
 			go pl.CommandFn(&context)
+
 		}
 	}
 

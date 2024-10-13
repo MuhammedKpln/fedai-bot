@@ -13,6 +13,7 @@ type Plugin struct {
 	CommandRegex *regexp.Regexp
 	CommandInfo  string
 	CommandFn    func(*PluginRunOptions)
+	IsPublic     *bool
 }
 
 type PluginRunOptions struct {
