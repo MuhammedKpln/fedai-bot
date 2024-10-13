@@ -16,6 +16,7 @@ RUN go build --trimpath -o /fedai main.go
 FROM debian:stable AS server
 WORKDIR /app
 
+RUN apt update && apt install -y ffmpeg
 COPY --from=serverBuilder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=pluginBuilder /help.so ./pl/help.so
 COPY --from=pluginBuilder /voicy.so ./pl/voicy.so
