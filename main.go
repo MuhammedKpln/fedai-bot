@@ -4,8 +4,6 @@ import (
 	C "muhammedkpln/fedai/core"
 	M "muhammedkpln/fedai/modules"
 	S "muhammedkpln/fedai/shared"
-	"regexp"
-
 	_ "github.com/mattn/go-sqlite3"
 	"go.mau.fi/whatsmeow/types"
 	waLog "go.mau.fi/whatsmeow/util/log"
@@ -14,22 +12,6 @@ import (
 )
 
 var appLog = waLog.Stdout("APP", "INFO", true)
-
-func ExtractCommands() *regexp.Regexp {
-	var pattern = ""
-	for _, plugin := range M.LoadedPlugins {
-
-		if len(M.LoadedPlugins) < 1 {
-			pattern += plugin.CommandRegex.String()
-
-		} else {
-			pattern += plugin.CommandRegex.String() + "|"
-
-		}
-	}
-
-	return regexp.MustCompile(pattern)
-}
 
 func CommandCatcher(message string) *S.Plugin {
 	var pl *S.Plugin
@@ -53,7 +35,6 @@ func CommandCatcher(message string) *S.Plugin {
 func handleMessageEvent(message *events.Message) {
 	// set as unavailable to not see(?) the message
 	go C.GetClient().SendChatPresence(message.Info.Chat, "unavailable", types.ChatPresenceMediaText)
-
 	var m = message.Message.ExtendedTextMessage
 	var textMessage = m.GetText()
 

@@ -29,7 +29,7 @@ func main() {
 		outputFile := fmt.Sprintf("pl/%s.so", fileNameWithoutExt)
 		inputFile := fmt.Sprintf("pl/%s.go", fileNameWithoutExt)
 
-		cmd := exec.Command("go", "build", "-buildmode=plugin", "-o", outputFile, inputFile)
+		cmd := exec.Command("go", "build", "-buildmode=plugin", "--trimpath", "-o", outputFile, inputFile)
 
 		err := cmd.Start()
 
