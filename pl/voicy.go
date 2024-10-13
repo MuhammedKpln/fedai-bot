@@ -14,6 +14,7 @@ import (
 
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"go.mau.fi/whatsmeow/proto/waE2E"
+	"google.golang.org/protobuf/proto"
 )
 
 var Plugin S.Plugin = S.Plugin{
@@ -21,29 +22,43 @@ var Plugin S.Plugin = S.Plugin{
 	CommandRegex: regexp.MustCompile(".voicy"),
 	CommandInfo:  "Translates voice to text",
 	CommandFn:    Run,
+	IsPublic:     proto.Bool(true),
+}
+
+func Feedback(msg string, message *S.PluginRunOptions) {
+	client := C.GetClient()
+	botJID := client.Store.ID.ToNonAD()
+
+	if botJID == message.SenderJID {
+		go Context.EditMessage(msg, message)
+		return
+	}
+
+	go Context.SendQuotedMessage(message.ChatJID, msg, message.SenderJID.String(), &message.StanzaID, message.Message.Message)
+
 }
 
 func Run(message *S.PluginRunOptions) {
 
 	if os.Getenv("WITAI_TOKEN") == "" {
-		go Context.EditMessage(Context.ErrorMessage("Token ekle."), message)
+		Feedback(Context.ErrorMessage("Token ekle."), message)
 
 		return
 	}
 
 	if message.IsQuoted && message.QuotedMessage.GetAudioMessage() != nil {
-		go Context.EditMessage(Context.InfoMessage("Dinliyorum..."), message)
+		Feedback(Context.InfoMessage("Dinliyorum..."), message)
 
 		err := DownloadAudio(message.QuotedMessage)
 		if err != nil {
-			go Context.EditMessage(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
+			Feedback(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
 			Cleanup()
 
 			return
 		}
 		stereoErr := StereoToMonoConverter()
 		if stereoErr != nil {
-			go Context.EditMessage(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
+			Feedback(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
 			Cleanup()
 
 			return
@@ -52,7 +67,7 @@ func Run(message *S.PluginRunOptions) {
 		finalMessage, finalMessageErr := RecognizeAudio()
 
 		if finalMessageErr != nil {
-			go Context.EditMessage(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
+			Feedback(Context.ErrorMessage("Yanlis biseyler oldu, olmadi be usta..."), message)
 			Cleanup()
 
 			return
@@ -60,11 +75,11 @@ func Run(message *S.PluginRunOptions) {
 
 		m := S.If(finalMessage == nil, Context.InfoMessage("Birsey duyamadim, sanirim konusmayi daha ögrenememis..."), Context.SuccessMessage(string(*finalMessage)))
 
-		go Context.EditMessage(m, message)
+		Feedback(m, message)
 		Cleanup()
 
 	} else {
-		go Context.EditMessage(Context.ErrorMessage("Lutfen ses alintila."), message)
+		Feedback(Context.ErrorMessage("Lutfen ses alintila."), message)
 	}
 
 }
