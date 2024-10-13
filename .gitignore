@@ -1,0 +1,4 @@
+*.so
+compile_plugins
+main
+database.db
