@@ -25,5 +25,6 @@ COPY --from=pluginBuilder /voicy.so ./pl/voicy.so
 COPY --from=pluginBuilder /plugin.so ./pl/plugin.so
 COPY --from=pluginBuilder /plugins.so ./pl/plugins.so
 COPY --from=serverBuilder /fedai .
+COPY --from=serverBuilder /app/start.sh .
 
 CMD [ "/fedai" ]

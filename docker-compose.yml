@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ./start.sh
+    command: sh start.sh
     env_file:
       - .env
     volumes:
