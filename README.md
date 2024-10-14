@@ -15,6 +15,7 @@ Fedai is an modular WhatsApp userbot that has plugin support.
 | Plugin    | Description | Done |
 |----------|----------|----------|
 | Voicy  | Speech-to-text   | ✅ |
+| Plugin Manager  | Handle Plugins(install,delete)   | ✅ |
 
 ## F.A.Q
 
