@@ -1,4 +1,4 @@
-package modules
+package core
 
 import (
 	"fmt"
@@ -9,6 +9,14 @@ import (
 	"plugin"
 	"strings"
 )
+
+func DeletePlugin(path string) {
+	err := os.Remove(path)
+
+	if err != nil {
+		panic(err)
+	}
+}
 
 var LoadedPlugins = map[string]S.Plugin{}
 
@@ -21,25 +29,23 @@ func LoadModules() {
 	for _, file := range files {
 		if strings.HasSuffix(file.Name(), ".so") {
 			var fileNameWithoutExt = strings.Split(file.Name(), ".")[0]
-
+			var filePath = path.Join("pl", file.Name())
 			// Open the plugin
-			plug, err := plugin.Open(path.Join("pl", file.Name()))
+			plug, err := plugin.Open(filePath)
 			if err != nil {
-				fmt.Println(err)
-				panic(err)
+				AppLog().Errorf("Loader: Error loading plugin, deleting ", err.Error())
+
+				DeletePlugin(filePath)
+				continue
 			}
 
 			pluginSym, err := plug.Lookup("Plugin")
 			if err != nil {
-				fmt.Printf("Failed to find 'Run' in plugin %s: %v\n", file.Name(), err)
+				AppLog().Errorf("Loader: Error loading plugin, deleting ", err.Error())
 				continue
 			}
 
 			plugin, plOk := pluginSym.(*S.Plugin)
-
-			// fmt.Printf("Type of symGreeter: %T\n", plugin)
-			// fmt.Printf("Type of symGreeter: %T\n", command)
-			// fmt.Printf("Type of symGreeter: %T\n", commandInfo)
 
 			if !plOk {
 				fmt.Printf("Unexpected plugin for '%s' in plugin %s\n", file.Name(), file.Name())
