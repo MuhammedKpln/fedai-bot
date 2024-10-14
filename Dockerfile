@@ -2,6 +2,7 @@ FROM golang:1.23.1-bookworm as pluginBuilder
 WORKDIR /app
 COPY . .
 RUN go mod download
+ENV ENV=PRODUCTION
 RUN bash -c /app/scripts/compile_plugins.sh
 
 FROM golang:1.23.1-bookworm as serverBuilder
