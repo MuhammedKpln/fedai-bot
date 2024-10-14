@@ -1,4 +1,4 @@
-FROM golang:latest as pluginBuilder
+FROM golang:1.23.1-bookworm as pluginBuilder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN go build --buildmode=plugin --trimpath -o /plugin.so /app/pl/plugin.go
 RUN go build --buildmode=plugin --trimpath -o /plugins.so /app/pl/plugins.go
 
 
-FROM golang:latest as serverBuilder
+FROM golang:1.23.1-bookworm as serverBuilder
 WORKDIR /app
 COPY . .
 RUN go build --trimpath -o /fedai main.go
