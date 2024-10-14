@@ -17,7 +17,11 @@ for file in $files; do
   inputFile="pl/${fileNameWithoutExt}.go"
 
   # Build the Go plugin
-  go build -buildmode=plugin -o "$outputFile" "$inputFile"
+  if [[ "${ENV}" != "PRODUCTION" ]]; then
+    go build -buildmode=plugin -o "$outputFile" "$inputFile"
+  else
+    go build -buildmode=plugin --trimpath -o "$outputFile" "$inputFile"
+  fi
 
   # Check if the build was successful
   if [ $? -eq 0 ]; then
