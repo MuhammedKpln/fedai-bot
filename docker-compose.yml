@@ -3,12 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: server
     command: sh start.sh
     env_file:
       - .env
     volumes:
-      - data:/app/database.db
-      - data:/app/app.db
+      - db_data:/app
 
 volumes:
-  data:
+  db_data:
+    driver: local
