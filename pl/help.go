@@ -20,7 +20,7 @@ var Plugin S.Plugin = S.Plugin{
 	CommandFn:    Run,
 }
 
-func Run(message *S.PluginRunOptions) {
+func Run(message *S.PluginRunOptions, payload S.RegexpMatches) {
 	var helpString string
 	client := C.GetClient()
 	for _, plugin := range M.LoadedPlugins {

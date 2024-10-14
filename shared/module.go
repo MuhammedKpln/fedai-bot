@@ -8,11 +8,17 @@ import (
 	"go.mau.fi/whatsmeow/types/events"
 )
 
+type RegexpMatches struct {
+	Match   string
+	Action  *string
+	Payload *string
+}
+
 type Plugin struct {
 	Name         string
 	CommandRegex *regexp.Regexp
 	CommandInfo  string
-	CommandFn    func(*PluginRunOptions)
+	CommandFn    func(*PluginRunOptions, RegexpMatches)
 	IsPublic     *bool
 }
 

@@ -1,5 +1,7 @@
 *.so
 compile_plugins
 main
+fedai
 database.db
+app.db
 .env

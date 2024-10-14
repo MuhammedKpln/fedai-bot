@@ -1,9 +1,9 @@
 services:
   fedai:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
-    command:  ./fedai
+    command: ./start.sh
     env_file:
       - .env
     volumes:

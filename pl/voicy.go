@@ -38,7 +38,7 @@ func Feedback(msg string, message *S.PluginRunOptions) {
 
 }
 
-func Run(message *S.PluginRunOptions) {
+func Run(message *S.PluginRunOptions, Payload S.RegexpMatches) {
 
 	if os.Getenv("WITAI_TOKEN") == "" {
 		Feedback(Context.ErrorMessage("Token ekle."), message)
