@@ -7,7 +7,7 @@ import (
 
 type Plugin struct {
 	gorm.Model
-	Name string
+	Name string `gorm:"index,unique"`
 	Url  string
 }
 

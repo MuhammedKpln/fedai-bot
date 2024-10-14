@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	C "muhammedkpln/fedai/core"
-	M "muhammedkpln/fedai/modules"
 	S "muhammedkpln/fedai/shared"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -15,7 +14,7 @@ import (
 func CommandCatcher(message string) (*S.Plugin, S.RegexpMatches) {
 	var pl *S.Plugin
 	var foundMatches S.RegexpMatches
-	for _, plugin := range M.LoadedPlugins {
+	for _, plugin := range C.LoadedPlugins {
 		var matches = plugin.CommandRegex.FindStringSubmatch(message)
 
 		if len(matches) > 0 {
@@ -118,10 +117,9 @@ func eventHandler(evt interface{}) {
 
 func main() {
 	C.LoadDotenv()
-	M.LoadModules()
-	C.AppLog().Infof("Modules loaded")
 	C.LoadDatabase()
+	C.LoadModules()
+	C.AppLog().Infof("Modules loaded")
 	C.AppLog().Infof("Database loaded")
 	C.EstablishConnection(eventHandler)
-
 }

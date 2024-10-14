@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io"
 	Cx "muhammedkpln/fedai/context"
 	C "muhammedkpln/fedai/core"
 	"muhammedkpln/fedai/shared"
 	S "muhammedkpln/fedai/shared"
-	"net/http"
 	"os"
+	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -45,20 +44,17 @@ func Run(message *shared.PluginRunOptions, Payload S.RegexpMatches) {
 func DelPlugin(message *shared.PluginRunOptions, Payload S.RegexpMatches) {
 	splittedUrl := strings.Split(*Payload.Payload, "/")
 	file := splittedUrl[len(splittedUrl)-1]
+	filePath := path.Join("pl", file)
+	err := C.DeletePlugin(filePath, file)
 
-	os.Remove(fmt.Sprintf("./pl/%s", file))
-
-	database := C.GetDatabase()
-	var plugin C.Plugin
-	database.Where(C.Plugin{Name: file, Url: *Payload.Payload}).Attrs(C.Plugin{
-		Name: file,
-		Url:  *Payload.Payload,
-	}).Delete(&plugin)
+	if err != nil {
+		go Cx.EditMessage(Cx.ErrorMessage(fmt.Sprintf("Could not uninstall the plugin... %s", err)), message)
+		return
+	}
 
 	go Cx.EditMessage(Cx.InfoMessage(fmt.Sprintf("Deleted %s, restarting in 5 seconds...", file)), message)
 
 	time.Sleep(5 * time.Second)
-
 	os.Exit(0)
 }
 
@@ -68,46 +64,20 @@ func AddPlugin(message *shared.PluginRunOptions, Payload S.RegexpMatches) {
 
 	go Cx.EditMessage(Cx.InfoMessage(fmt.Sprintf("Downloading %s...", file)), message)
 
-	client := &http.Client{
-		CheckRedirect: func(req *http.Request, via []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
+	err := C.AddPlugin(file, *Payload.Payload)
 
-	resp, err := client.Get(*Payload.Payload)
-	defer resp.Body.Close()
+	if err != nil && err.Error() == "pl_exists" {
+		go Cx.EditMessage(Cx.InfoMessage(fmt.Sprintf("%s: You already have this plugin installed.", file)), message)
+		return
+	}
 
 	if err != nil {
-		panic(err)
+		go Cx.EditMessage(Cx.ErrorMessage(fmt.Sprintf("Could not install the plugin... %s", err)), message)
+		return
 	}
-
-	go Cx.EditMessage(Cx.InfoMessage(fmt.Sprintf("Writing %s...", file)), message)
-
-	out, err := os.Create(fmt.Sprintf("./pl/%s", file))
-	defer out.Close()
-	n, err := io.Copy(out, resp.Body)
-
-	if err != nil {
-		panic(err)
-	}
-
-	database := C.GetDatabase()
-	var plugin C.Plugin
-	database.Where(C.Plugin{Name: file, Url: *Payload.Payload}).Attrs(C.Plugin{
-		Name: file,
-		Url:  *Payload.Payload,
-	}).FirstOrCreate(&plugin)
-
-	// database.Create(C.Plugin{
-	// 	Name: file,
-	// 	Url:  *Payload.Payload,
-	// })
 
 	go Cx.EditMessage(Cx.SuccessMessage("Download Complete, restarting in 5 seconds..."), message)
 
-	fmt.Printf("Written %s bytes", n)
-
 	time.Sleep(5 * time.Second)
-
 	os.Exit(0)
 }

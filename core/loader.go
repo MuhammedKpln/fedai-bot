@@ -10,14 +10,6 @@ import (
 	"strings"
 )
 
-func DeletePlugin(path string) {
-	err := os.Remove(path)
-
-	if err != nil {
-		panic(err)
-	}
-}
-
 var LoadedPlugins = map[string]S.Plugin{}
 
 func LoadModules() {
@@ -35,7 +27,7 @@ func LoadModules() {
 			if err != nil {
 				AppLog().Errorf("Loader: Error loading plugin, deleting ", err.Error())
 
-				DeletePlugin(filePath)
+				DeletePlugin(filePath, file.Name())
 				continue
 			}
 

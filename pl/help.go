@@ -5,7 +5,6 @@ import (
 	"fmt"
 	Cx "muhammedkpln/fedai/context"
 	C "muhammedkpln/fedai/core"
-	M "muhammedkpln/fedai/modules"
 	S "muhammedkpln/fedai/shared"
 	"regexp"
 	"time"
@@ -23,7 +22,7 @@ var Plugin S.Plugin = S.Plugin{
 func Run(message *S.PluginRunOptions, payload S.RegexpMatches) {
 	var helpString string
 	client := C.GetClient()
-	for _, plugin := range M.LoadedPlugins {
+	for _, plugin := range C.LoadedPlugins {
 		helpString += fmt.Sprintf("_*%s*_ \n *About*: %s \n Command: *%s* \n\n", plugin.Name, plugin.CommandInfo, plugin.CommandRegex.String())
 	}
 
