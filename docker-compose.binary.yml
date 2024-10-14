@@ -1,0 +1,14 @@
+services:
+  fedai:
+    build:
+      context: .
+      dockerfile: Dockerfilebin
+    command: /app/fedai-linux-amd64
+    env_file:
+      - .env
+    volumes:
+      - db_data:/app
+
+volumes:
+  db_data:
+    driver: local

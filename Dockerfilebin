@@ -1,0 +1,9 @@
+FROM debian:stable
+WORKDIR /app
+RUN apt update && apt install -y ffmpeg wget unzip
+RUN wget https://github.com/muhammedkpln/fedai-bot/releases/latest/download/fedai-linux-amd64
+RUN wget https://github.com/muhammedkpln/fedai-bot/releases/latest/download/plugins.zip
+
+RUN chmod +x fedai-linux-amd64
+RUN mkdir pl
+RUN unzip ./plugins.zip -d ./pl
